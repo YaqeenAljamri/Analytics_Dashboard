@@ -1,0 +1,33 @@
+services:
+  flask:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+
+  celery:
+    build: .
+    command: celery -A app.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: analytics
+    ports:
+      - "5432:5432"
